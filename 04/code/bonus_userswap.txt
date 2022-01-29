@@ -1,0 +1,23 @@
+The idea is to lock anything that may cause a race condition with a global
+mutex. Although something like locking the entire page_fault_handler with a
+mutex would work, the performance will not be great as the handler takes some
+time to execute.
+
+Instead, I have put all updates to my linkedlists storing information (three of
+them; allocs, resident_pages, & swap_locations) and creations, updates and 
+deletions of virtual memory regions (mmap, munmap, mprotect) into a critical 
+section with a mutex. 
+
+From the IBM docs, calls to create, update, and delete virtual memory sections
+are non atomic and it says to "Use one of these synchronization methods around
+access and modifications if atomic access is required."
+(https://www.ibm.com/docs/en/i/7.4?topic=ssw_ibm_i_74/apis/mmap.htm)
+
+In my implementation, these two are the only areas where there may be a possible
+race condition. By locking them in a critical section, we ensure correctness
+even on concurrent reads and writes.
+
+Note that this does not prevent race conditions that arise due to misuse of the
+library. For example, if user were to write to the same location with multiple
+threads without any synchronisation constructs, there will be a race condition.
+

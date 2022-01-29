@@ -1,0 +1,7 @@
+#!/bin/bash
+end=$((SECONDS+120))
+
+while [ $SECONDS -lt $end ]; do
+    echo I am groot
+    sleep $[ ($RANDOM % 5) + 1 ]s
+done

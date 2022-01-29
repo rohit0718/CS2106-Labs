@@ -1,0 +1,17 @@
+#!/bin/bash
+
+be_lazy () {
+    echo "Give me 5 more seconds"
+    sleep 5
+    exit 0
+}
+
+trap be_lazy SIGTERM
+
+echo "Good morning..."
+
+end=$((SECONDS+120))
+
+while [ $SECONDS -lt $end ]; do
+    sleep 1
+done
